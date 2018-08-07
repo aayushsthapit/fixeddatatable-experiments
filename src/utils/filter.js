@@ -1,21 +1,6 @@
 import * as constants from "../constants/dataTypes";
 import { appTableConfig } from "../App";
 export const filter = (list, filterStatus) => {
-  // return list.filter(test => {
-  //   return (
-  //     (filterStatus.name
-  //       ? test.name
-  //           .toString()
-  //           .toLowerCase()
-  //           .startsWith(filterStatus.name.toString().toLowerCase())
-  //       : true) &&
-  //     (filterStatus.id.from
-  //       ? test.id >= filterStatus.id.from &&
-  //         (filterStatus.id.to ? test.id <= filterStatus.id.to : true)
-  //       : true)
-  //   );
-  // });
-
   return list.filter(listElement => {
     let testBoolean = true;
     Object.keys(filterStatus).map(colKey => {
