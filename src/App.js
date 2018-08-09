@@ -62,6 +62,7 @@ class App extends Component {
     this.onColumnResizeEndCallback = this.onColumnResizeEndCallback.bind(this);
     this.filterData = this.filterData.bind(this);
     this.initializeFilterStatus = this.initializeFilterStatus.bind(this);
+    this.resetAll = this.resetAll.bind(this);
   }
 
   onColumnResizeEndCallback = (newColumnWidth, columnKey) => {
@@ -123,46 +124,56 @@ class App extends Component {
     }
   }
 
+  resetAll() {
+    this.setState({
+      filterStatus: this.initializeFilterStatus(this.state.data),
+      updatedData: this.state.data
+    });
+  }
+
   render() {
     return (
-      <Table
-        rowHeight={50}
-        rowsCount={this.state.updatedData.length}
-        width={800}
-        isColumnResizing={false}
-        onColumnResizeEndCallback={this.onColumnResizeEndCallback}
-        height={800}
-        headerHeight={50}
-      >
-        {Object.keys(appTableConfig).map(key => {
-          let colConfig = appTableConfig[key];
+      <div>
+        <Table
+          rowHeight={50}
+          rowsCount={this.state.updatedData.length}
+          width={800}
+          isColumnResizing={false}
+          onColumnResizeEndCallback={this.onColumnResizeEndCallback}
+          height={800}
+          headerHeight={50}
+        >
+          {Object.keys(appTableConfig).map(key => {
+            let colConfig = appTableConfig[key];
 
-          return (
-            <Column
-              key
-              header={
-                colConfig.header ? (
-                  colConfig.header(
-                    key,
-                    colConfig.dataType,
-                    colConfig.label,
-                    this.filterData,
-                    this.state.filterStatus
+            return (
+              <Column
+                key
+                header={
+                  colConfig.header ? (
+                    colConfig.header(
+                      key,
+                      colConfig.dataType,
+                      colConfig.label,
+                      this.filterData,
+                      this.state.filterStatus
+                    )
+                  ) : (
+                    <Cell>{colConfig.label}</Cell>
                   )
-                ) : (
-                  <Cell>{colConfig.label}</Cell>
-                )
-              }
-              isResizable={true}
-              columnKey={key}
-              cell={props => (
-                <Cell>{this.state.updatedData[props.rowIndex][key]}</Cell>
-              )}
-              width={this.state.config[key].width}
-            />
-          );
-        })}
-      </Table>
+                }
+                isResizable={true}
+                columnKey={key}
+                cell={props => (
+                  <Cell>{this.state.updatedData[props.rowIndex][key]}</Cell>
+                )}
+                width={this.state.config[key].width}
+              />
+            );
+          })}
+        </Table>
+        <button onClick={() => this.resetAll()}>Reset</button>
+      </div>
     );
   }
 }

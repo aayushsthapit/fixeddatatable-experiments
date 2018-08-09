@@ -1,6 +1,5 @@
 import React from "react";
 import "../App.css";
-import "rc-checkbox/assets/index.css";
 
 import * as constant from "../constants/dataTypes";
 export const ShowFilters = ({
