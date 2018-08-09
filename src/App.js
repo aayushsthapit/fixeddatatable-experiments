@@ -7,30 +7,26 @@ import { filter } from "./utils/filter";
 import { ShowFilters } from "./Components/ShowFilters";
 import * as constants from "./constants/dataTypes";
 import { sortListData } from "./utils/sort";
+import { collectionListGenerator } from "./utils/collectionListGenerator";
 
 const header = (colHeaderKey, dataType, label, filterData, filterStatus) => {
   return (
     <Cell
-      onMouseEnter={() => {
-        switch (dataType) {
-          case "string": {
-            break;
-          }
-          default: {
-            break;
-          }
-        }
-      }}
+      className="header"
       onClick={() => {
         filterData(colHeaderKey, "sort", filterStatus);
       }}
     >
-      <ShowFilters
-        filterData={filterData}
-        colHeaderKey={colHeaderKey}
-        dataType={dataType}
-        filterStatus={filterStatus}
-      />
+      {dataType ? (
+        <ShowFilters
+          filterData={filterData}
+          colHeaderKey={colHeaderKey}
+          dataType={dataType}
+          filterStatus={filterStatus}
+        />
+      ) : (
+        ""
+      )}
       {label}
     </Cell>
   );
@@ -44,6 +40,12 @@ export const appTableConfig = {
     color: "red",
     header,
     dataType: constants.STRING
+  },
+  category: {
+    label: "Category",
+    width: 200,
+    header,
+    dataType: constants.COLLECTION
   }
 };
 
@@ -51,6 +53,7 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
+      disabled: false,
       data: [],
       updatedData: [],
       config: appTableConfig,
@@ -58,6 +61,7 @@ class App extends Component {
     };
     this.onColumnResizeEndCallback = this.onColumnResizeEndCallback.bind(this);
     this.filterData = this.filterData.bind(this);
+    this.initializeFilterStatus = this.initializeFilterStatus.bind(this);
   }
 
   onColumnResizeEndCallback = (newColumnWidth, columnKey) => {
@@ -68,17 +72,33 @@ class App extends Component {
       }
     });
   };
+
+  initializeFilterStatus(data) {
+    let tempFilterStatus = {};
+    Object.keys(appTableConfig).map(value => {
+      switch (appTableConfig[value].dataType) {
+        case constants.COLLECTION: {
+          tempFilterStatus = {
+            ...tempFilterStatus,
+            [value]: collectionListGenerator(data, value)
+          };
+          break;
+        }
+
+        default: {
+          tempFilterStatus = { ...tempFilterStatus, [value]: "" };
+          break;
+        }
+      }
+    });
+    return tempFilterStatus;
+  }
   componentWillMount = () => {
     getData().then(res => {
-      let tempFilterStatus = {};
-      Object.keys(appTableConfig).map(value => {
-        tempFilterStatus = { ...tempFilterStatus, [value]: "" };
-      });
-
       this.setState({
         data: res.data.data,
         updatedData: res.data.data,
-        filterStatus: tempFilterStatus
+        filterStatus: this.initializeFilterStatus(res.data.data)
       });
     });
   };
@@ -102,49 +122,47 @@ class App extends Component {
       }
     }
   }
+
   render() {
     return (
-      <div className="test1">
-        <Table
-          rowHeight={50}
-          rowsCount={this.state.updatedData.length}
-          width={800}
-          isColumnResizing={false}
-          onColumnResizeEndCallback={this.onColumnResizeEndCallback}
-          height={800}
-          headerHeight={50}
-          className="test1"
-        >
-          {Object.keys(appTableConfig).map(key => {
-            let colConfig = appTableConfig[key];
+      <Table
+        rowHeight={50}
+        rowsCount={this.state.updatedData.length}
+        width={800}
+        isColumnResizing={false}
+        onColumnResizeEndCallback={this.onColumnResizeEndCallback}
+        height={800}
+        headerHeight={50}
+      >
+        {Object.keys(appTableConfig).map(key => {
+          let colConfig = appTableConfig[key];
 
-            return (
-              <Column
-                key
-                header={
-                  colConfig.header ? (
-                    colConfig.header(
-                      key,
-                      colConfig.dataType,
-                      colConfig.label,
-                      this.filterData,
-                      this.state.filterStatus
-                    )
-                  ) : (
-                    <Cell>{colConfig.label}</Cell>
+          return (
+            <Column
+              key
+              header={
+                colConfig.header ? (
+                  colConfig.header(
+                    key,
+                    colConfig.dataType,
+                    colConfig.label,
+                    this.filterData,
+                    this.state.filterStatus
                   )
-                }
-                isResizable={true}
-                columnKey={key}
-                cell={props => (
-                  <Cell>{this.state.updatedData[props.rowIndex][key]}</Cell>
-                )}
-                width={this.state.config[key].width}
-              />
-            );
-          })}
-        </Table>
-      </div>
+                ) : (
+                  <Cell>{colConfig.label}</Cell>
+                )
+              }
+              isResizable={true}
+              columnKey={key}
+              cell={props => (
+                <Cell>{this.state.updatedData[props.rowIndex][key]}</Cell>
+              )}
+              width={this.state.config[key].width}
+            />
+          );
+        })}
+      </Table>
     );
   }
 }

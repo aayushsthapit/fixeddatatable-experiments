@@ -31,12 +31,32 @@
   }
 }
 
-.test {
+.filter {
+  top: 50px;
+  overflow: visible;
   position: absolute;
-  color: blue;
-  top: 0px;
+  display: none;
+  background: lightgray;
+  font-size: 18px;
+  cursor: pointer;
 }
 
-.test1 {
-  position: relative;
+.header:hover .filter {
+  display: block;
+}
+.fixedDataTableRowLayout_main {
+  overflow: visible;
+}
+
+.fixedDataTableCellGroupLayout_cellGroupWrapper
+  .fixedDataTableCellGroupLayout_cellGroup {
+  overflow: visible;
+}
+
+.fixedDataTableCellGroupLayout_cellGroup .fixedDataTableCellLayout_main {
+  overflow: visible;
+}
+
+.fixedDataTableRowLayout_rowWrapper .fixedDataTableRowLayout_main {
+  overflow: visible;
 }
